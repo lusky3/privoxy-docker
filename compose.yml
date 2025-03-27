@@ -1,0 +1,19 @@
+services:
+  privoxy:
+    container_name: privoxy
+    hostname: privoxy
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8118:8118"
+    restart: unless-stopped
+    volumes:
+      - ./config.conf:/etc/privoxy/config:ro
+    networks:
+      - proxy-network
+
+networks:
+  proxy-network:
+    name: proxy-network
+    driver: bridge

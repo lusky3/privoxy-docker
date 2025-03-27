@@ -1,0 +1,44 @@
+name: Update Privoxy Stable Version
+
+on:
+  schedule:
+    - cron: '0 2 * * 0' # Weekly on Sundays at 2 AM UTC
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Get latest Privoxy version from SourceForge
+        id: get-version
+        run: |
+          LATEST_VERSION=$(curl -s "https://sourceforge.net/projects/ijbswa/rss?path=/Sources" | \
+            grep -oP 'privoxy-\K[0-9]+\.[0-9]+\.[0-9]+(?=-stable)' | \
+            sort -V | tail -n1)
+          echo "version=$LATEST_VERSION" >> $GITHUB_OUTPUT
+          echo "Latest stable Privoxy version: $LATEST_VERSION"
+
+      - name: Update Dockerfile
+        run: |
+          CURRENT_VERSION=$(grep "ARG PRIVOXY_VERSION=" Dockerfile | cut -d'=' -f2 || echo "not found")
+          NEW_VERSION="${{ steps.get-version.outputs.version }}"
+          
+          if [ "$CURRENT_VERSION" != "$NEW_VERSION" ]; then
+            sed -i "s/ARG PRIVOXY_VERSION=.*/ARG PRIVOXY_VERSION=$NEW_VERSION/" Dockerfile
+            echo "Updated Privoxy stable version to $NEW_VERSION"
+          else
+            echo "No update needed - already using $NEW_VERSION"
+          fi
+
+      - name: Commit changes
+        run: |
+          git config --local user.email "github-actions@github.com"
+          git config --local user.name "GitHub Actions"
+          git add Dockerfile
+          git commit -m "Update Privoxy stable to version ${{ steps.get-version.outputs.version }}" || echo "No changes to commit"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
