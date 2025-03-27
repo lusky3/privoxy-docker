@@ -43,7 +43,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/privoxy
+            ${{ vars.DOCKERHUB_USERNAME }}/privoxy
             ghcr.io/${{ github.repository }}/privoxy
           tags: |
             type=raw,value=${{ steps.version.outputs.version }}
