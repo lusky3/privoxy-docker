@@ -3,7 +3,9 @@
 This repository provides Docker images for [Privoxy](https://www.privoxy.org/), a non-caching web proxy with advanced filtering capabilities. Two image variants are available:
 
 - **`lusky3/privoxy:latest`** and **`lusky3/privoxy:<version>`** (e.g., `4.0.0`): Built from stable releases on [SourceForge](https://sourceforge.net/projects/ijbswa/files/Sources/).
-- **`lusky3/privoxy:nightly`**: Built daily from the latest commit in the [Privoxy Git repository](https://www.privoxy.org/git/privoxy.git).
+- ~**`lusky3/privoxy:nightly`**: Built daily from the latest commit in the [Privoxy Git repository](https://www.privoxy.org/git/privoxy.git).~
+
+Due to the git repo returning a 403 error for the past several weeks, the nightly build workflow has been disabled for the time being.
 
 Images are available on both [DockerHub](https://hub.docker.com/r/lusky3/privoxy) and [GitHub Container Registry](https://ghcr.io/lusky3/privoxy-docker).
 
