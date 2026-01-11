@@ -15,7 +15,7 @@ RUN apk add --no-cache \
 
 # Arguments for source selection
 ARG BUILD_SOURCE=sourceforge
-ARG PRIVOXY_VERSION=4.0.0
+ARG PRIVOXY_VERSION=4.1.0
 
 # Download and build Privoxy based on source
 WORKDIR /usr/src
