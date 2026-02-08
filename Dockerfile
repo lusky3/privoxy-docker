@@ -9,6 +9,7 @@ RUN apk add --no-cache \
     make \
     musl-dev \
     pcre-dev \
+    pcre2-dev \
     zlib-dev \
     curl \
     git
@@ -24,8 +25,11 @@ RUN if [ "$BUILD_SOURCE" = "sourceforge" ]; then \
         tar xzf privoxy.tar.gz && \
         cd privoxy-${PRIVOXY_VERSION}-stable; \
     else \
-        git clone https://www.privoxy.org/git/privoxy.git && \
-        cd privoxy; \
+        curl -H "Cookie: Please_let_me_pass=1" \
+            "https://www.privoxy.org/gitweb/?p=privoxy.git;a=snapshot;h=HEAD;sf=tgz" \
+            -o privoxy.tar.gz && \
+        tar xzf privoxy.tar.gz && \
+        cd privoxy-HEAD-*; \
     fi && \
     autoheader && \
     autoconf && \
@@ -39,6 +43,7 @@ FROM alpine:latest
 # Install runtime dependencies
 RUN apk add --no-cache \
     pcre \
+    pcre2 \
     zlib \
     curl
 

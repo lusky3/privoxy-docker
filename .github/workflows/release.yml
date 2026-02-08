@@ -1,0 +1,47 @@
+name: Create Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., 4.1.0)'
+        required: true
+        type: string
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ inputs.version }}
+          release_name: Privoxy ${{ inputs.version }}
+          body: |
+            ## Privoxy Docker ${{ inputs.version }}
+            
+            Docker images for Privoxy ${{ inputs.version }}
+            
+            ### Images
+            - `lusky3/privoxy:${{ inputs.version }}`
+            - `lusky3/privoxy:latest`
+            - `ghcr.io/lusky3/privoxy-docker:${{ inputs.version }}`
+            
+            ### Platforms
+            - linux/amd64
+            - linux/arm64
+            
+            ### Usage
+            ```bash
+            docker pull lusky3/privoxy:${{ inputs.version }}
+            docker run -d -p 8118:8118 lusky3/privoxy:${{ inputs.version }}
+            ```
+          draft: false
+          prerelease: false

@@ -2,10 +2,8 @@
 
 This repository provides Docker images for [Privoxy](https://www.privoxy.org/), a non-caching web proxy with advanced filtering capabilities. Two image variants are available:
 
-- **`lusky3/privoxy:latest`** and **`lusky3/privoxy:<version>`** (e.g., `4.0.0`): Built from stable releases on [SourceForge](https://sourceforge.net/projects/ijbswa/files/Sources/).
-- ~**`lusky3/privoxy:nightly`**: Built daily from the latest commit in the [Privoxy Git repository](https://www.privoxy.org/git/privoxy.git).~
-
-Due to the git repo returning a 403 error for the past several weeks, the nightly build workflow has been disabled for the time being.
+- **`lusky3/privoxy:latest`** and **`lusky3/privoxy:<version>`** (e.g., `4.1.0`): Built from stable releases on [SourceForge](https://sourceforge.net/projects/ijbswa/files/Sources/).
+- **`lusky3/privoxy:nightly`**: Built daily from the latest commit in the [Privoxy Git repository](https://www.privoxy.org/gitweb/?p=privoxy.git).
 
 Images are available on both [DockerHub](https://hub.docker.com/r/lusky3/privoxy) and [GitHub Container Registry](https://ghcr.io/lusky3/privoxy-docker).
 
@@ -27,10 +25,10 @@ Images are available on both [DockerHub](https://hub.docker.com/r/lusky3/privoxy
   docker pull lusky3/privoxy:latest
   ```
 
-- Specific stable version (e.g., 4.0.0):
+- Specific stable version (e.g., 4.1.0):
 
   ```bash
-  docker pull lusky3/privoxy:4.0.0
+  docker pull lusky3/privoxy:4.1.0
   ```
 
 - Nightly (latest Git commit):
@@ -63,12 +61,12 @@ curl -x http://localhost:8118 http://example.com
 
 ## Tags
 
-- `lusky3/privoxy:latest`: Latest stable release (e.g., 4.0.0 as of March 26, 2025).
-- `lusky3/privoxy:<version>`: Specific stable versions (e.g., `4.0.0`).
+- `lusky3/privoxy:latest`: Latest stable release (e.g., 4.1.0 as of February 2026).
+- `lusky3/privoxy:<version>`: Specific stable versions (e.g., `4.1.0`).
 - `lusky3/privoxy:nightly`: Latest Git commit, rebuilt daily.
 - `lusky3/privoxy:<sha>`: Git SHA tags for both stable and nightly builds.
 
-The same tags are available on GitHub Container Registry (e.g., `ghcr.io/lusky3/privoxy-docker:4.0.0`).
+The same tags are available on GitHub Container Registry (e.g., `ghcr.io/lusky3/privoxy-docker:4.1.0`).
 
 ## Build Process
 
@@ -79,7 +77,7 @@ The same tags are available on GitHub Container Registry (e.g., `ghcr.io/lusky3/
   - Workflow: `.github/workflows/build-stable.yml`.
 
 - **Nightly Builds**:
-  - Source: [Privoxy Git repository](https://www.privoxy.org/git/privoxy.git).
+  - Source: [Privoxy Git repository](https://www.privoxy.org/gitweb/?p=privoxy.git) (snapshot tarball).
   - Trigger: Daily at midnight UTC or manual dispatch.
   - Workflow: `.github/workflows/build-nightly.yml`.
 
@@ -89,10 +87,10 @@ The `Dockerfile` supports both sources using build arguments (`BUILD_SOURCE` and
 
 To build locally:
 
-- Stable (e.g., 4.0.0):
+- Stable (e.g., 4.1.0):
   
   ```bash
-  docker build -t privoxy:4.0.0 --build-arg BUILD_SOURCE=sourceforge --build-arg PRIVOXY_VERSION=4.0.0 .
+  docker build -t privoxy:4.1.0 --build-arg BUILD_SOURCE=sourceforge --build-arg PRIVOXY_VERSION=4.1.0 .
   ```
 
 - Nightly:

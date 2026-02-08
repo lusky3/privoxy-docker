@@ -1,0 +1,57 @@
+name: Test PR Builds
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  test-stable:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Extract Privoxy version from Dockerfile
+        id: version
+        run: |
+          VERSION=$(grep "ARG PRIVOXY_VERSION=" Dockerfile | cut -d'=' -f2)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Build stable image (test only)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          platforms: linux/amd64
+          build-args: |
+            BUILD_SOURCE=sourceforge
+            PRIVOXY_VERSION=${{ steps.version.outputs.version }}
+
+  test-nightly:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build nightly image (test only)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          platforms: linux/amd64
+          build-args: |
+            BUILD_SOURCE=git
