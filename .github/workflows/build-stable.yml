@@ -61,3 +61,14 @@ jobs:
           build-args: |
             BUILD_SOURCE=sourceforge
             PRIVOXY_VERSION=${{ steps.version.outputs.version }}
+
+      - name: Discord notification
+        if: always()
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          status: ${{ job.status }}
+          title: "Stable Build"
+          description: "Privoxy ${{ steps.version.outputs.version }} stable build"
+          color: 0x00ff00
+          username: GitHub Actions

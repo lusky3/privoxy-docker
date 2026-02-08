@@ -52,3 +52,14 @@ jobs:
           platforms: linux/amd64,linux/arm64
           build-args: |
             BUILD_SOURCE=git
+
+      - name: Discord notification
+        if: always()
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          status: ${{ job.status }}
+          title: "Nightly Build"
+          description: "Privoxy nightly build from latest commit"
+          color: 0x0099ff
+          username: GitHub Actions

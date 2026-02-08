@@ -34,11 +34,30 @@ jobs:
           fi
 
       - name: Commit changes
+        id: commit
         run: |
           git config --local user.email "github-actions@github.com"
           git config --local user.name "GitHub Actions"
           git add Dockerfile
-          git commit -m "Update Privoxy stable to version ${{ steps.get-version.outputs.version }}" || echo "No changes to commit"
-          git push
+          if git commit -m "Update Privoxy stable to version ${{ steps.get-version.outputs.version }}"; then
+            git push
+            echo "updated=true" >> $GITHUB_OUTPUT
+          else
+            echo "updated=false" >> $GITHUB_OUTPUT
+            echo "No changes to commit"
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Discord notification
+        if: always()
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          status: ${{ job.status }}
+          title: "Version Update Check"
+          description: |
+            Latest version: ${{ steps.get-version.outputs.version }}
+            Updated: ${{ steps.commit.outputs.updated }}
+          color: 0xffaa00
+          username: GitHub Actions
