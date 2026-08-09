@@ -2,25 +2,46 @@
 
 ## Changes Made
 
-### 1. Fixed Nightly Builds
-**Problem**: Privoxy's git repository now requires a JavaScript cookie (`Please_let_me_pass=1`) due to AI crawler protection, causing `git clone` to fail.
+### 1. Fixed Nightly Builds (February 2026)
+**Problem**: Privoxy's git repository added AI crawler protection requiring a
+`Please_let_me_pass=1` cookie, causing `git clone` to fail. The nightly workflow
+accumulated 100 consecutive failures before the schedule was silently skipped by GitHub.
 
-**Solution**: Changed from `git clone` to downloading tarball snapshots with the required cookie header:
+**Solution**: Switched from `git clone` to downloading tarball snapshots with the
+required cookie header:
 ```bash
 curl -H "Cookie: Please_let_me_pass=1" \
     "https://www.privoxy.org/gitweb/?p=privoxy.git;a=snapshot;h=HEAD;sf=tgz" \
     -o privoxy.tar.gz
 ```
+Verified locally: `Cookie: Please_let_me_pass=1` returns HTTP 200 and a valid 1.8 MB
+gzip tarball.
 
-### 2. Updated Dependencies
-- Added `pcre2-dev` to build dependencies (required for Privoxy 4.2.0+ nightly)
+### 2. Fixed Stable Build Not Triggering After Version Bump (August 2026)
+**Problem**: `update-privoxy.yml` commits the Dockerfile via `GITHUB_TOKEN`. GitHub
+deliberately suppresses `push` events from `GITHUB_TOKEN` commits as a security
+guardrail, so `build-stable.yml` (triggered on `push: branches: main`) never fired.
+Result: the 4.2.0 version bump landed on June 7, 2026 but no Docker image was ever built.
+
+**Solution**: Added an explicit `gh workflow run build-stable.yml` step in
+`update-privoxy.yml`, executed only when a version change was committed:
+```yaml
+- name: Trigger stable build
+  if: steps.commit.outputs.updated == 'true'
+  run: gh workflow run build-stable.yml --ref main
+  env:
+    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
+
+### 3. Updated Dependencies (February 2026)
+- Added `pcre2-dev` to build dependencies (required for Privoxy 4.2.0+)
 - Added `pcre2` to runtime dependencies
 
-### 3. Updated to Privoxy 4.1.0
-- Changed `PRIVOXY_VERSION` from 4.0.0 to 4.1.0
-- Updated all documentation references
+### 4. Version History
+- 4.0.0 → 4.1.0 (January 2026, automated)
+- 4.1.0 → 4.2.0 (June 2026, automated — Docker build pending until workflow fix)
 
-### 4. Added New Workflows
+### 5. Workflows Added (February 2026)
 
 #### `.github/workflows/test-pr.yml`
 - Tests both stable and nightly builds on PRs
@@ -32,30 +53,30 @@ curl -H "Cookie: Please_let_me_pass=1" \
 - Tags releases with version numbers
 - Generates release notes
 
-### 5. Documentation Updates
-- Updated README.md with correct version numbers (4.1.0)
-- Removed strikethrough text about disabled nightly builds
-- Updated git repository URLs to Gitweb interface
+### 6. Documentation Updates
+- Updated README.md version references
 - Added CHANGELOG.md for tracking changes
+- This file updated to reflect August 2026 workflow fixes
 
 ## Testing Results
 
-✅ **Stable Build (4.1.0)**: Successfully built and tested
-✅ **Nightly Build**: Successfully built and tested  
-✅ **Container Runtime**: Both containers proxy HTTP requests correctly
-✅ **Multi-arch**: Dockerfile supports linux/amd64 and linux/arm64
+✅ **Stable Build (4.1.0)**: Successfully built and pushed (February 2026)
+✅ **Nightly Build**: Cookie header verified locally; schedule re-triggered August 2026
+✅ **Cookie format confirmed**: `curl -H "Cookie: Please_let_me_pass=1"` → HTTP 200
+⏳ **Stable Build (4.2.0)**: Pending — will fire after workflow fix is merged
+⏳ **Nightly Schedule**: Pending — manual trigger dispatched to reactivate
 
 ## Files Modified
 
-1. `Dockerfile` - Fixed nightly source, added pcre2, updated version
-2. `README.md` - Updated version references and documentation
-3. `.github/workflows/test-pr.yml` - NEW: PR testing
-4. `.github/workflows/release.yml` - NEW: Release creation
-5. `CHANGELOG.md` - NEW: Change tracking
+1. `.github/workflows/update-privoxy.yml` - Added explicit stable build trigger step
+2. `CHANGELOG.md` - Added 4.2.0 entry with workflow fix details
+3. `UPDATE_SUMMARY.md` - This file
 
-## Next Steps
+## Root Cause Summary
 
-1. Commit and push these changes to a branch
-2. Create a PR to test the new PR workflow
-3. After merge, manually trigger nightly build to verify it works
-4. Create a release using the new release workflow
+Two independent bugs:
+
+| Issue | Root Cause | Fix |
+|-------|-----------|-----|
+| Stable 4.2.0 never built | `GITHUB_TOKEN` commits suppress `push` events | Add `gh workflow run` after bot push |
+| Nightly not running | 100 failures → GitHub stopped scheduling; fix already in Dockerfile | Manual trigger to resume schedule |

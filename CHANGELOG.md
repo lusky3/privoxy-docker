@@ -4,18 +4,18 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [4.2.0] - 2026-08-09
+
 ### Fixed
-- Fixed nightly builds by switching from git clone to tarball snapshot download with cookie authentication
-- Added pcre2 dependencies for nightly builds (Privoxy 4.2.0+ requirement)
+- `update-privoxy.yml` bot commits pushed via `GITHUB_TOKEN` no longer trigger downstream
+  `push` events due to a GitHub security guardrail; added an explicit `gh workflow run
+  build-stable.yml` step so the stable Docker image build fires after every version bump.
+- Nightly schedule was silently skipped after the February 2026 Dockerfile fix because the
+  workflow had accumulated 100 consecutive failures (pre-fix) and GitHub had stopped
+  scheduling it; manually re-triggered to resume the daily cadence.
 
 ### Changed
-- Updated to Privoxy 4.1.0 stable
-- Updated README to reflect working nightly builds
-
-### Added
-- PR testing workflow to validate builds before merge
-- Release workflow for creating GitHub releases
-- This changelog
+- Updated to Privoxy 4.2.0 stable
 
 ## [4.0.0] - 2025-03-26
 

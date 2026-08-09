@@ -49,6 +49,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Trigger stable build
+        if: steps.commit.outputs.updated == 'true'
+        run: gh workflow run build-stable.yml --ref main
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Discord notification
         if: always()
         uses: sarisia/actions-status-discord@v1
