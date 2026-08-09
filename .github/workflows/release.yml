@@ -15,36 +15,32 @@ jobs:
       contents: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Create Release
-        uses: actions/create-release@v1
+        run: |
+          gh release create "v${{ inputs.version }}" \
+            --title "Privoxy ${{ inputs.version }}" \
+            --notes "## Privoxy Docker ${{ inputs.version }}
+
+          Docker images for Privoxy ${{ inputs.version }}
+
+          ### Images
+          - \`lusky3/privoxy:${{ inputs.version }}\`
+          - \`lusky3/privoxy:latest\`
+          - \`ghcr.io/lusky3/privoxy-docker:${{ inputs.version }}\`
+
+          ### Platforms
+          - linux/amd64
+          - linux/arm64
+
+          ### Usage
+          \`\`\`bash
+          docker pull lusky3/privoxy:${{ inputs.version }}
+          docker run -d -p 8118:8118 lusky3/privoxy:${{ inputs.version }}
+          \`\`\`"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: v${{ inputs.version }}
-          release_name: Privoxy ${{ inputs.version }}
-          body: |
-            ## Privoxy Docker ${{ inputs.version }}
-            
-            Docker images for Privoxy ${{ inputs.version }}
-            
-            ### Images
-            - `lusky3/privoxy:${{ inputs.version }}`
-            - `lusky3/privoxy:latest`
-            - `ghcr.io/lusky3/privoxy-docker:${{ inputs.version }}`
-            
-            ### Platforms
-            - linux/amd64
-            - linux/arm64
-            
-            ### Usage
-            ```bash
-            docker pull lusky3/privoxy:${{ inputs.version }}
-            docker run -d -p 8118:8118 lusky3/privoxy:${{ inputs.version }}
-            ```
-          draft: false
-          prerelease: false
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Discord notification
         if: always()
