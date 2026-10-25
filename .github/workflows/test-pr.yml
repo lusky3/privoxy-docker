@@ -8,7 +8,7 @@ on:
 
 jobs:
   test-stable:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -47,7 +47,7 @@ jobs:
           username: GitHub Actions
 
   test-nightly:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
